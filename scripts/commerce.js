@@ -15,6 +15,9 @@ import {
 } from './aem.js';
 import initializeDropins from './initializers/index.js';
 
+export const COMMERCE_CORE_ENDPOINT = 'https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql';
+export const COMMERCE_ENDPOINT = 'https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql';
+
 let consentGranted = false;
 
 /** Returns the latest upstream consent notification for this document. */
