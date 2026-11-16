@@ -1,0 +1,22 @@
+import '@percy/cypress';
+import './b2bLoginHelpers';
+import './b2bSetupCompany';
+import './deleteCustomer';
+import './deleteNegotiableQuotes';
+import './fillField';
+import './getIFrameField';
+import './getUserTokenCookie';
+import './hideFetchAndXhrLogs';
+import './interceptConfig';
+import './loginHelper';
+import './logToTerminal';
+import './percyTakeSnapshot';
+import './sessionStorage';
+import './waitForImages';
+import './waitForLoadingSkeletonToDisappear';
+import './waitForResource';
+import './waitForUserInGrid';
+import './waitForWishlistPage';
+
+import registerCypressGrep from '@cypress/grep';
+registerCypressGrep();
