@@ -1,0 +1,554 @@
+import {
+  InLineAlert,
+  Icon,
+  Button,
+  provider as UI,
+} from '@dropins/tools/components.js';
+import { h } from '@dropins/tools/preact.js';
+import { events } from '@dropins/tools/event-bus.js';
+import { tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
+import * as pdpApi from '@dropins/storefront-pdp/api.js';
+import { render as pdpRendered } from '@dropins/storefront-pdp/render.js';
+import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js';
+
+import { WishlistToggle } from '@dropins/storefront-wishlist/containers/WishlistToggle.js';
+import { WishlistAlert } from '@dropins/storefront-wishlist/containers/WishlistAlert.js';
+
+// Containers
+import ProductHeader from '@dropins/storefront-pdp/containers/ProductHeader.js';
+import ProductPrice from '@dropins/storefront-pdp/containers/ProductPrice.js';
+import ProductShortDescription from '@dropins/storefront-pdp/containers/ProductShortDescription.js';
+import ProductOptions from '@dropins/storefront-pdp/containers/ProductOptions.js';
+import ProductQuantity from '@dropins/storefront-pdp/containers/ProductQuantity.js';
+import ProductDescription from '@dropins/storefront-pdp/containers/ProductDescription.js';
+import ProductAttributes from '@dropins/storefront-pdp/containers/ProductAttributes.js';
+import ProductGallery from '@dropins/storefront-pdp/containers/ProductGallery.js';
+import ProductGiftCardOptions from '@dropins/storefront-pdp/containers/ProductGiftCardOptions.js';
+import ProductCustomizableOptions from '@dropins/storefront-pdp/containers/ProductCustomizableOptions.js';
+
+// Order Dropin Components
+import * as orderApi from '@dropins/storefront-order/api.js';
+
+// Payment Services Dropin
+import ApplePay from '@dropins/storefront-payment-services/containers/ApplePay.js';
+import GooglePay from '@dropins/storefront-payment-services/containers/GooglePay.js';
+import PayPalButtons from '@dropins/storefront-payment-services/containers/PayPalButtons.js';
+import { render as PaymentServices } from '@dropins/storefront-payment-services/render.js';
+import { PaymentLocation, PaymentMethodCode } from '@dropins/storefront-payment-services/api.js';
+
+// Libs
+import {
+  rootLink,
+  fetchPlaceholders,
+} from '../../scripts/commerce.js';
+
+// Initializers
+import { IMAGES_SIZES } from '../../scripts/initializers/pdp.js';
+import '../../scripts/initializers/cart.js';
+import '../../scripts/initializers/wishlist.js';
+import '../../scripts/initializers/payment-services.js';
+
+// Checkout success block import and CSS preload
+import {
+  renderCheckoutSuccess,
+  preloadCheckoutSuccess,
+} from '../commerce-checkout-success/commerce-checkout-success.js';
+
+preloadCheckoutSuccess();
+
+// Function to update the Add to Cart button text and its accessible name
+function updateAddToCartButtonText(addToCartInstance, inCart, labels, productName) {
+  const buttonText = inCart
+    ? labels.Global?.UpdateProductInCart
+    : labels.Global?.AddProductToCart;
+  if (addToCartInstance) {
+    addToCartInstance.setProps((prev) => ({
+      ...prev,
+      children: buttonText,
+      'aria-label': `${buttonText} ${productName}`,
+    }));
+  }
+}
+
+/**
+ * Formats numeric attribute values for display (e.g., "10.000000" → "10").
+ * Non-numeric values are returned as-is.
+ */
+function formatNumericAttributeValue(value) {
+  const trimmed = value.trim();
+  if (!/^[+-]?\d+(\.\d+)?$/.test(trimmed)) return value;
+  return new Intl.NumberFormat(document.documentElement.lang).format(Number(trimmed));
+}
+
+export default async function decorate(block) {
+  const eventProduct = events.lastPayload('pdp/data') ?? null;
+  // bug: the pdp sends an object with event data even if product is not found.
+  let product = eventProduct?.sku ? eventProduct : null;
+
+  const labels = await fetchPlaceholders();
+
+  // Read itemUid from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const itemUidFromUrl = urlParams.get('itemUid');
+
+  // State to track if we are in update mode
+  let isUpdateMode = false;
+
+  // State to track if the current product/variant is out of stock
+  let isOutOfStock = false;
+
+  // Layout
+  const fragment = document.createRange().createContextualFragment(`
+    <div class="product-details__alert"></div>
+    <div class="product-details__wrapper">
+      <div class="product-details__left-column">
+        <div class="product-details__gallery"></div>
+      </div>
+      <div class="product-details__right-column">
+        <div class="product-details__header"></div>
+        <div class="product-details__price"></div>
+        <div class="product-details__gallery"></div>
+        <div class="product-details__short-description"></div>
+        <div class="product-details__gift-card-options"></div>
+        <div class="product-details__customizable-options"></div>
+        <div class="product-details__configuration">
+          <div class="product-details__options"></div>
+          <div class="product-details__quantity"></div>
+          <div class="product-details__buttons">
+            <div class="product-details__buttons__add-to-cart"></div>
+            <div class="product-details__buttons__add-to-wishlist"></div>
+            <div class="product-details__buttons__payment-services product-details__buttons__payment-services-apple-pay"></div>
+            <div class="product-details__buttons__payment-services product-details__buttons__payment-services-google-pay"></div>
+            <div class="product-details__buttons__payment-services product-details__buttons__payment-services-paypal"></div>
+          </div>
+          <div class="product-details__add-to-cart-status" role="status" aria-live="polite"></div>
+        </div>
+        <div class="product-details__description"></div>
+        <div class="product-details__attributes"></div>
+      </div>
+    </div>
+  `);
+
+  const $alert = fragment.querySelector('.product-details__alert');
+  const $gallery = fragment.querySelector('.product-details__gallery');
+  const $header = fragment.querySelector('.product-details__header');
+  const $price = fragment.querySelector('.product-details__price');
+  const $galleryMobile = fragment.querySelector('.product-details__right-column .product-details__gallery');
+  const $shortDescription = fragment.querySelector('.product-details__short-description');
+  const $options = fragment.querySelector('.product-details__options');
+  const $quantity = fragment.querySelector('.product-details__quantity');
+  const $giftCardOptions = fragment.querySelector('.product-details__gift-card-options');
+  const $customizableOptions = fragment.querySelector('.product-details__customizable-options');
+  const $addToCart = fragment.querySelector('.product-details__buttons__add-to-cart');
+  const $applePay = fragment.querySelector('.product-details__buttons__payment-services-apple-pay');
+  const $googlePay = fragment.querySelector('.product-details__buttons__payment-services-google-pay');
+  const $payPal = fragment.querySelector('.product-details__buttons__payment-services-paypal');
+  const $wishlistToggleBtn = fragment.querySelector('.product-details__buttons__add-to-wishlist');
+  // Kept mounted at all times so the "Adding to Cart" status is reliably
+  // announced instead of relying on the button's text/disabled state
+  // changing, which isn't announced by screen readers on its own.
+  const $addToCartStatus = fragment.querySelector('.product-details__add-to-cart-status');
+  const $description = fragment.querySelector('.product-details__description');
+  const $attributes = fragment.querySelector('.product-details__attributes');
+
+  block.replaceChildren(fragment);
+
+  const gallerySlots = {
+    CarouselThumbnail: (ctx) => {
+      if (ctx.mediaType === 'image') {
+        tryRenderAemAssetsImage(ctx, {
+          ...imageSlotConfig(ctx),
+          wrapper: document.createElement('span'),
+        });
+      }
+    },
+
+    CarouselMainImage: (ctx) => {
+      if (ctx.mediaType === 'image') {
+        tryRenderAemAssetsImage(ctx, {
+          ...imageSlotConfig(ctx),
+        });
+      }
+    },
+  };
+
+  // Alert
+  let inlineAlert = null;
+  const routeToWishlist = rootLink('/wishlist');
+  const onPaymentSuccess = ({ cartId }) => orderApi.placeOrder(cartId)
+    .then((orderData) => renderCheckoutSuccess(null, { orderData }))
+    .catch(console.error);
+
+  const [
+    _galleryMobile,
+    _gallery,
+    _header,
+    _price,
+    _shortDescription,
+    _options,
+    _quantity,
+    _giftCardOptions,
+    _customizableOptions,
+    _description,
+    _attributes,
+    wishlistToggleBtn,
+    applePayButton,
+    googlePayButton,
+    payPalButtons,
+  ] = await Promise.all([
+    // Gallery (Mobile)
+    pdpRendered.render(ProductGallery, {
+      controls: 'dots',
+      arrows: true,
+      peak: false,
+      gap: 'small',
+      loop: false,
+      videos: true, // Display videos if available
+      imageParams: {
+        ...IMAGES_SIZES,
+      },
+
+      slots: gallerySlots,
+    })($galleryMobile),
+
+    // Gallery (Desktop)
+    pdpRendered.render(ProductGallery, {
+      controls: 'thumbnailsColumn',
+      arrows: true,
+      peak: true,
+      gap: 'small',
+      loop: false,
+      videos: true, // Display videos if available
+      imageParams: {
+        ...IMAGES_SIZES,
+      },
+
+      slots: gallerySlots,
+    })($gallery),
+
+    // Header
+    pdpRendered.render(ProductHeader, {})($header),
+
+    // Price
+    pdpRendered.render(ProductPrice, {})($price),
+
+    // Short Description
+    pdpRendered.render(ProductShortDescription, {})($shortDescription),
+
+    // Configuration - Swatches
+    pdpRendered.render(ProductOptions, {
+      hideSelectedValue: false,
+      slots: {
+        SwatchImage: (ctx) => {
+          tryRenderAemAssetsImage(ctx, {
+            ...imageSlotConfig(ctx),
+            wrapper: document.createElement('span'),
+          });
+        },
+      },
+    })($options),
+
+    // Configuration  Quantity
+    pdpRendered.render(ProductQuantity, {})($quantity),
+
+    // Configuration  Gift Card Options
+    pdpRendered.render(ProductGiftCardOptions, {})($giftCardOptions),
+
+    // Configuration  Customizable Options
+    pdpRendered.render(ProductCustomizableOptions, {})($customizableOptions),
+
+    // Description
+    pdpRendered.render(ProductDescription, {})($description),
+
+    // Attributes
+    pdpRendered.render(ProductAttributes, {
+      formatValue: formatNumericAttributeValue,
+    })($attributes),
+
+    // Wishlist button - WishlistToggle Container
+    wishlistRender.render(WishlistToggle, {
+      product,
+    })($wishlistToggleBtn),
+
+    PaymentServices.render(ApplePay, {
+      location: PaymentLocation.PRODUCT_DETAIL,
+      createCart: {
+        getCartItems: () => {
+          const values = events.lastPayload('pdp/values');
+          if (!values) {
+            throw new Error('No products selected.');
+          }
+          return [{
+            sku: values.sku,
+            quantity: values.quantity,
+            selectedOptions: values.optionsUIDs,
+            enteredOptions: values.enteredOptions,
+          }];
+        },
+      },
+      onSuccess: onPaymentSuccess,
+      onError: async (localizedError) => {
+        inlineAlert = await UI.render(InLineAlert, {
+          heading: localizedError.name,
+          description: localizedError.message,
+          icon: h(Icon, { source: 'OrderError' }),
+          'aria-live': 'assertive',
+          role: 'alert',
+          type: 'error',
+          onDismiss: () => inlineAlert.remove(),
+        })($alert);
+      },
+      hidden: true,
+    })($applePay),
+
+    PaymentServices.render(GooglePay, {
+      location: PaymentLocation.PRODUCT_DETAIL,
+      onSuccess: onPaymentSuccess,
+      onError: async (localizedError) => {
+        inlineAlert = await UI.render(InLineAlert, {
+          heading: localizedError.name,
+          description: localizedError.message,
+          icon: h(Icon, { source: 'OrderError' }),
+          'aria-live': 'assertive',
+          role: 'alert',
+          type: 'error',
+          onDismiss: () => inlineAlert.remove(),
+        })($alert);
+      },
+      hidden: true,
+    })($googlePay),
+
+    PaymentServices.render(PayPalButtons, {
+      location: PaymentLocation.PRODUCT_DETAIL,
+      onSuccess: onPaymentSuccess,
+      onError: async (localizedError) => {
+        inlineAlert = await UI.render(InLineAlert, {
+          heading: localizedError.name,
+          description: localizedError.message,
+          icon: h(Icon, { source: 'OrderError' }),
+          'aria-live': 'assertive',
+          role: 'alert',
+          type: 'error',
+          onDismiss: () => inlineAlert.remove(),
+        })($alert);
+      },
+      hidden: true,
+    })($payPal),
+  ]);
+
+  // Configuration – Button - Add to Cart
+  const getProductName = () => product?.name || product?.sku;
+  const addToCart = await UI.render(Button, {
+    'aria-label': `${labels.Global?.AddProductToCart} ${getProductName()}`,
+    children: labels.Global?.AddProductToCart,
+    icon: h(Icon, { source: 'Cart' }),
+    onClick: async () => {
+      const buttonActionText = isUpdateMode
+        ? labels.Global?.UpdatingInCart
+        : labels.Global?.AddingToCart;
+      try {
+        addToCart.setProps((prev) => ({
+          ...prev,
+          children: buttonActionText,
+          disabled: true,
+        }));
+        $addToCartStatus.textContent = buttonActionText ?? 'Adding to Cart';
+
+        // get the current selection values
+        const values = pdpApi.getProductConfigurationValues();
+        const valid = pdpApi.isProductConfigurationValid();
+
+        // add or update the product in the cart
+        if (valid) {
+          if (isUpdateMode) {
+            // --- Update existing item ---
+            const { updateProductsFromCart } = await import(
+              '@dropins/storefront-cart/api.js'
+            );
+
+            await updateProductsFromCart([{ ...values, uid: itemUidFromUrl }]);
+
+            // --- START REDIRECT ON UPDATE ---
+            const updatedSku = values?.sku;
+            if (updatedSku) {
+              const cartRedirectUrl = new URL(
+                rootLink('/cart'),
+                window.location.origin,
+              );
+              cartRedirectUrl.searchParams.set('itemUid', itemUidFromUrl);
+              window.location.href = cartRedirectUrl.toString();
+            } else {
+              // Fallback if SKU is somehow missing (shouldn't happen in normal flow)
+              console.warn(
+                'Could not retrieve SKU for updated item. Redirecting to cart without parameter.',
+              );
+              window.location.href = rootLink('/cart');
+            }
+            return;
+          }
+          // --- Add new item ---
+          const { addProductsToCart } = await import(
+            '@dropins/storefront-cart/api.js'
+          );
+          await addProductsToCart([{ ...values }]);
+        }
+
+        // reset any previous alerts if successful
+        inlineAlert?.remove();
+      } catch (error) {
+        // add alert message
+        inlineAlert = await UI.render(InLineAlert, {
+          heading: 'Error',
+          description: error.message,
+          icon: h(Icon, { source: 'Warning' }),
+          'aria-live': 'assertive',
+          role: 'alert',
+          onDismiss: () => {
+            inlineAlert.remove();
+          },
+        })($alert);
+
+        // Scroll the alertWrapper into view
+        $alert.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      } finally {
+        // Reset button text using the helper function which respects the current mode
+        updateAddToCartButtonText(addToCart, isUpdateMode, labels, getProductName());
+        // Re-enable button, unless the current variant is out of stock
+        addToCart.setProps((prev) => ({
+          ...prev,
+          disabled: isOutOfStock,
+        }));
+        $addToCartStatus.textContent = '';
+      }
+    },
+  })($addToCart);
+
+  // Lifecycle Events
+  events.on('pdp/data', (data) => {
+    product = data?.sku ? data : product;
+    isOutOfStock = data?.inStock === false;
+    addToCart.setProps((prev) => ({ ...prev, disabled: isOutOfStock }));
+    updateAddToCartButtonText(addToCart, isUpdateMode, labels, getProductName());
+    applePayButton.setProps((prev) => ({ ...prev, disabled: isOutOfStock }));
+    googlePayButton.setProps((prev) => ({ ...prev, disabled: isOutOfStock }));
+    payPalButtons.setProps((prev) => ({ ...prev, disabled: isOutOfStock }));
+  }, { eager: true });
+
+  events.on('pdp/valid', (valid) => {
+    // update add to cart button disabled state based on product selection validity and stock status
+    addToCart.setProps((prev) => ({ ...prev, disabled: isOutOfStock || !valid }));
+    applePayButton.setProps((prev) => ({ ...prev, disabled: isOutOfStock || !valid }));
+    googlePayButton.setProps((prev) => ({ ...prev, disabled: isOutOfStock || !valid }));
+    payPalButtons.setProps((prev) => ({ ...prev, disabled: isOutOfStock || !valid }));
+  }, { eager: true });
+
+  // Handle option changes
+  events.on('pdp/values', () => {
+    if (wishlistToggleBtn) {
+      const configValues = pdpApi.getProductConfigurationValues();
+
+      // Check URL parameter for empty optionsUIDs
+      const urlOptionsUIDs = urlParams.get('optionsUIDs');
+
+      // If URL has empty optionsUIDs parameter, treat as base product (no options)
+      const optionUIDs = urlOptionsUIDs === '' ? undefined : (configValues?.optionsUIDs || undefined);
+
+      wishlistToggleBtn.setProps((prev) => ({
+        ...prev,
+        product: {
+          ...product,
+          optionUIDs,
+        },
+      }));
+    }
+  }, { eager: true });
+
+  events.on('wishlist/alert', ({ action, item }) => {
+    wishlistRender.render(WishlistAlert, {
+      action,
+      item,
+      routeToWishlist,
+    })($alert);
+
+    setTimeout(() => {
+      $alert.innerHTML = '';
+    }, 5000);
+
+    setTimeout(() => {
+      $alert.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 0);
+  });
+
+  // --- Add new event listener for cart/data ---
+  events.on(
+    'cart/data',
+    (cartData) => {
+      let itemIsInCart = false;
+      if (itemUidFromUrl && cartData?.items) {
+        itemIsInCart = cartData.items.some(
+          (item) => item.uid === itemUidFromUrl,
+        );
+      }
+      // Set the update mode state
+      isUpdateMode = itemIsInCart;
+
+      // Update button text based on whether the item is in the cart
+      updateAddToCartButtonText(addToCart, itemIsInCart, labels, getProductName());
+    },
+    { eager: true },
+  );
+
+  events.on('commerce/customer-context', async () => {
+    if (!product?.sku) {
+      return;
+    }
+
+    const values = pdpApi.getProductConfigurationValues();
+    const refreshedProduct = await pdpApi.fetchProductData(product.sku, {
+      optionsUIDs: values?.optionsUIDs,
+    });
+
+    if (refreshedProduct) {
+      events.emit('pdp/data', refreshedProduct);
+    }
+  });
+
+  // Show express payment buttons if available
+  events.on('payment-services/initialized/product-detail', ({ availablePaymentMethods }) => {
+    if (availablePaymentMethods.includes(PaymentMethodCode.APPLE_PAY)) {
+      applePayButton.setProps((prev) => ({ ...prev, hidden: false }));
+    }
+    if (availablePaymentMethods.includes(PaymentMethodCode.GOOGLE_PAY)) {
+      googlePayButton.setProps((prev) => ({ ...prev, hidden: false }));
+    }
+    if (availablePaymentMethods.includes(PaymentMethodCode.PAYPAL_BUTTONS)) {
+      payPalButtons.setProps((prev) => ({ ...prev, hidden: false }));
+    }
+  }, { eager: true });
+
+  return Promise.resolve();
+}
+
+/**
+ * Returns the configuration for an image slot.
+ * @param ctx - The context of the slot.
+ * @returns The configuration for the image slot.
+ */
+function imageSlotConfig(ctx) {
+  const { data, defaultImageProps } = ctx;
+  return {
+    alias: data.sku,
+    imageProps: defaultImageProps,
+
+    params: {
+      width: defaultImageProps.width,
+      height: defaultImageProps.height,
+    },
+  };
+}

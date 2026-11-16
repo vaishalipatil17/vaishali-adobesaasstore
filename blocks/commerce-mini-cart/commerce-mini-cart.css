@@ -1,0 +1,45 @@
+.commerce-mini-cart__update-message {
+    display: none;
+    font: var(--type-body-2-default-font);
+    letter-spacing: var(--type-body-2-default-letter-spacing);
+}
+
+.commerce-mini-cart__message-wrapper {
+    background-color: var(--color-positive-200);
+    border-radius: var(--shape-border-radius-1);
+    padding: var(--spacing-xsmall);
+    display: none;
+    margin-bottom: var(--spacing-small);
+}
+
+.commerce-mini-cart__message-wrapper--visible,
+.commerce-mini-cart__update-message--visible {
+    display: block;
+}
+
+.cart-item-promotions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xsmall);
+}
+
+.cart-item-promotions:empty {
+    display: none;
+}
+
+.cart-item-promotion-label {
+    font: var(--type-details-caption-1-font);
+    letter-spacing: var(--type-details-caption-1-letter-spacing);
+    color: var(--color-positive-800);
+}
+
+/* TEST ONLY (PAY-7186 local verification) — remove before committing/opening the PR */
+.commerce-mini-cart__test-order-button {
+  width: 100%;
+  margin-top: var(--spacing-small);
+  padding: var(--spacing-xsmall) var(--spacing-small);
+  background: #fde7e7;
+  border: 1px dashed #c00;
+  color: #c00;
+  cursor: pointer;
+}
