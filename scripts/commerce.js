@@ -17,6 +17,9 @@ import initializeDropins from './initializers/index.js';
 
 export const COMMERCE_CORE_ENDPOINT = 'https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql';
 export const COMMERCE_ENDPOINT = 'https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql';
+export const COMMERCE_STORE_CODE = 'default';
+export const COMMERCE_STORE_VIEW_CODE = 'default';
+
 
 let consentGranted = false;
 
