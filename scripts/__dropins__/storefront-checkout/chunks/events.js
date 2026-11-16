@@ -1,0 +1,4 @@
+/*! Copyright 2026 Adobe
+All Rights Reserved. */
+import{signal as s}from"@dropins/tools/signals.js";import{getCheckoutData as t}from"../api.js";const l=s(!1);function p(n){var e;return n===void 0?!!((e=t())!=null&&e.isVirtual):!!(n!=null&&n.isVirtual)}function g(n){return!n||n.isEmpty}function f(n){var r;if(!n)return null;const e=n.shippingAddresses||[];return e.length===0?null:(r=e[0])==null?void 0:r.selectedShippingMethod}function c(n,e="shipping"){var i;return n?(e==="shipping"?(i=n.shippingAddresses)==null?void 0:i[0]:n.billingAddress)??null:null}function d(n){if(!n)return null;const{selectedPaymentMethod:e}=n;return!e||!(e!=null&&e.code)?null:n.selectedPaymentMethod}export{c as getCartAddress,d as getCartPaymentMethod,f as getCartShippingMethod,g as isEmptyCart,l as isSetAddressRequestPending,p as isVirtualCart};
+//# sourceMappingURL=events.js.map
