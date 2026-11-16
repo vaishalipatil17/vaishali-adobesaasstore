@@ -1,0 +1,31 @@
+{
+  "public": {
+    "default": {
+      "commerce-core-endpoint": "https://qa-h47ppbq-oqyof733ykmii.us-4.magentosite.cloud/graphql",
+      "commerce-endpoint": "https://na1-sandbox.api.commerce.adobe.com/TfpwVBcuyz6LwDnKMNBVxP/graphql",
+      "adobe-commerce-optimizer": true,
+      "headers": {
+        "all": {
+          "Store": "default"
+        },
+        "cs": {
+          "content-type":"application/json",
+          "AC-View-Id":"08115f8d-bf17-4dfc-a6dd-af8fea7fb574",
+          "AC-Environment-Id":"TfpwVBcuyz6LwDnKMNBVxP",
+          "AC-Price-Book-Id":"base::b6589fc6ab0dc82cf12099d1c2d40ab994e8410c",
+          "AC-Source-Locale":"default",
+          "X-Api-Key": "storefront-catalog-apollo"
+        }
+      },
+      "analytics": {
+        "view-id": "08115f8d-bf17-4dfc-a6dd-af8fea7fb574",
+        "base-currency-code": "USD",
+        "environment": "Testing",
+        "locale":"default",
+        "environment-id": "TfpwVBcuyz6LwDnKMNBVxP",
+        "store-url": "https://e2e-rel12qapaas-aco-preprod--aem-boilerplate-commerce--hlxsites.aem.live/"
+        
+}
+    }
+  }
+}
