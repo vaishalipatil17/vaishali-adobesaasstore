@@ -1,0 +1,67 @@
+<meta
+  http-equiv="Content-Security-Policy"
+  content="script-src 'nonce-aem' 'strict-dynamic' 'unsafe-inline' http: https:; base-uri 'self'; object-src 'none'; frame-src 'self' https:;"
+  move-to-http-header="true"
+/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script nonce="aem" type="speculationrules">
+    {
+        "prerender": [{
+            "where": {
+                "href_matches": "/*"
+            },
+            "eagerness": "moderate"
+        }]
+    }
+</script>
+<script nonce="aem" type="importmap">
+    {
+        "imports": {
+            "@dropins/storefront-account/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-account/4.2.0/",
+            "@dropins/storefront-auth/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-auth/4.1.0/",
+            "@dropins/storefront-cart/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-cart/3.4.0/",
+            "@dropins/storefront-checkout/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-checkout/3.4.0/",
+            "@dropins/storefront-order/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-order/4.1.0/",
+            "@dropins/storefront-payment-services/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-payment-services/4.2.1/",
+            "@dropins/storefront-pdp/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-pdp/3.3.2/",
+            "@dropins/storefront-recommendations/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-recommendations/4.0.4/",
+            "@dropins/storefront-wishlist/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-wishlist/3.5.0/",
+            "@dropins/storefront-personalization/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-personalization/3.2.2/",
+            "@dropins/storefront-product-discovery/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-product-discovery/3.1.2/",
+            "@dropins/tools/": "https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/",
+            "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-account/4.2.0/fragments.js": "/scripts/__dropins__/storefront-account/fragments.js",
+            "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-auth/4.1.0/fragments.js": "/scripts/__dropins__/storefront-auth/fragments.js",
+            "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-cart/3.4.0/fragments.js": "/scripts/__dropins__/storefront-cart/fragments.js",
+            "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-checkout/3.4.0/fragments.js": "/scripts/__dropins__/storefront-checkout/fragments.js",
+            "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-order/4.1.0/fragments.js": "/scripts/__dropins__/storefront-order/fragments.js",
+            "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-pdp/3.3.2/fragments.js": "/scripts/__dropins__/storefront-pdp/fragments.js",
+            "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-product-discovery/3.1.2/fragments.js": "/scripts/__dropins__/storefront-product-discovery/fragments.js",
+            "https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-recommendations/4.0.4/fragments.js": "/scripts/__dropins__/storefront-recommendations/fragments.js"
+        }
+    }
+</script>
+
+<link rel="stylesheet" href="/styles/styles.css" />
+
+<script nonce="aem" type="module">
+    if (!(HTMLScriptElement.supports?.('importmap'))) {
+        import('https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/shims/importmap.js');
+    }
+</script>
+
+<script nonce="aem" src="/scripts/aem.js" type="module"></script>
+<script nonce="aem" src="/scripts/scripts.js" type="module"></script>
+<script nonce="aem" src="/scripts/commerce.js" type="module"></script>
+
+<link rel="modulepreload" href="https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/lib/aem/configs.js" />
+<link rel="modulepreload" href="/scripts/initializers/index.js" />
+<link rel="modulepreload" href="/scripts/initializers/auth.js" />
+<link rel="modulepreload" href="/scripts/initializers/personalization.js" />
+<link rel="modulepreload" href="https://3655614-commercedropinscdn-stage.adobeio-static.net/storefront-auth/4.1.0/api.js" />
+<link rel="modulepreload" href="https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/event-bus.js" />
+<link rel="modulepreload" href="https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/fetch-graphql.js" />
+<link rel="modulepreload" href="https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/initializer.js" />
+<link rel="modulepreload" href="https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/preact.js" />
+<link rel="modulepreload" href="https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/preact-compat.js" />
+<link rel="modulepreload" href="https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/preact-hooks.js" />
+<link rel="modulepreload" href="https://3655614-commercedropinscdn-stage.adobeio-static.net/tools/2.1.0/components.js" />
