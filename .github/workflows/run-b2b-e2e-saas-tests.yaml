@@ -1,0 +1,28 @@
+name: Cypress E2E B2B SaaS Tests
+on: push
+jobs:
+  cypress-b2b-saas-groups:
+    uses: ./.github/workflows/_b2b-e2e-base.yaml
+    with:
+      config-file: cypress.b2b.saas.config.js
+      grep-tags: '@B2BSaas'
+      url: 'https://main--boilerplate-b2b-accs--adobe-commerce.aem.live'
+      is-aco: false
+    secrets:
+      AEM_ASSETS_PRIVATE_USER: ${{ secrets.AEM_ASSETS_PRIVATE_USER }}
+      CYPRESS_API_ENDPOINT: ${{ secrets.CYPRESS_API_ENDPOINT }}
+      CYPRESS_IMS_CLIENT_ID: ${{ secrets.CYPRESS_IMS_CLIENT_ID }}
+      CYPRESS_IMS_ORG_ID: ${{ secrets.CYPRESS_IMS_ORG_ID }}
+      CYPRESS_IMS_CLIENT_SECRET: ${{ secrets.CYPRESS_IMS_CLIENT_SECRET }}
+
+  cypress-b2b-saas-run:
+    if: always()
+    needs: cypress-b2b-saas-groups
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check matrix result
+        run: |
+          if [ "${{ needs.cypress-b2b-saas-groups.result }}" != "success" ]; then
+            echo "One or more test groups failed: ${{ needs.cypress-b2b-saas-groups.result }}"
+            exit 1
+          fi
