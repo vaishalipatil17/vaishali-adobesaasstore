@@ -1,0 +1,43 @@
+.commerce-mini-cart__update-message {
+    display: none;
+    font: var(--type-body-2-default-font);
+    letter-spacing: var(--type-body-2-default-letter-spacing);
+}
+
+.commerce-mini-cart__message-wrapper {
+    background-color: var(--color-positive-200);
+    border-radius: var(--shape-border-radius-1);
+    padding: var(--spacing-xsmall);
+    display: none;
+    margin-bottom: var(--spacing-small);
+}
+
+.commerce-mini-cart__message-wrapper--visible,
+.commerce-mini-cart__update-message--visible {
+    display: block;
+}
+
+.commerce-mini-cart__message-wrapper--error {
+    background-color: var(--color-alert-200);
+}
+
+.commerce-mini-cart__apple-pay-error .dropin-alert-banner {
+    margin-bottom: var(--spacing-small);
+}
+
+.commerce-mini-cart__apple-pay-error .dropin-alert-banner__content {
+    grid-template-columns: max-content 1fr;
+}
+
+.commerce-mini-cart .cart-mini-cart__preCheckoutSection + .cart-mini-cart__footer__ctas {
+    padding-top: var(--spacing-xsmall);
+}
+
+.commerce-mini-cart__paypal:not(:empty),
+.commerce-mini-cart .commerce-mini-cart__google-pay:not(:empty) {
+    margin-top: var(--spacing-xsmall);
+}
+
+.commerce-mini-cart apple-pay-button {
+    --apple-pay-button-border-radius: var(--shape-border-radius-3);
+}
