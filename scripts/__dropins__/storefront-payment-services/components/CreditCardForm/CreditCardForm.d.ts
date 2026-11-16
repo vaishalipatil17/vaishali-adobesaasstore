@@ -1,0 +1,23 @@
+import { CardType } from '@adobe-commerce/payment-services-sdk/payment';
+import { FunctionComponent } from 'preact';
+import { HTMLAttributes } from 'preact/compat';
+
+export interface CreditCardFormProps extends HTMLAttributes<HTMLDivElement> {
+    cardContainerId: string;
+    cardNumberContainerId: string;
+    expirationDateContainerId: string;
+    securityCodeContainerId: string;
+    eligibleCardTypes: CardType[];
+    selectedCardType: CardType | null;
+    validationErrors: {
+        [key: string]: string;
+    };
+    isLoading?: boolean;
+    showSaveCard?: boolean;
+    saveCard?: boolean;
+    onSaveCardChange?: (checked: boolean) => void;
+    /** Overrides default i18n label for the save-card control */
+    saveCardLabel?: string;
+}
+export declare const CreditCardForm: FunctionComponent<CreditCardFormProps>;
+//# sourceMappingURL=CreditCardForm.d.ts.map
