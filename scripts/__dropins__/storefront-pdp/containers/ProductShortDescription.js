@@ -1,0 +1,4 @@
+/*! Copyright 2026 Adobe
+All Rights Reserved. */
+import{jsx as a}from"@dropins/tools/preact-jsx-runtime.js";import{useState as c,useEffect as m}from"@dropins/tools/preact-compat.js";import{classes as l}from"@dropins/tools/lib.js";import{events as p}from"@dropins/tools/event-bus.js";import{getFetchedProductData as u}from"../api.js";import"@dropins/tools/fetch-graphql.js";const s=({initialData:i=null,scope:o,children:d,...e})=>{const[t,n]=c(i);return m(()=>{const r=p.on("pdp/data",n,{scope:o});return()=>{r==null||r.off()}},[o]),t?a("div",{dangerouslySetInnerHTML:{__html:(t==null?void 0:t.shortDescription)??""},...e,className:l(["pdp-short-description",e.className])}):null};s.getInitialData=u;s.displayName="ProductShortDescription";export{s as ProductShortDescription,s as default};
+//# sourceMappingURL=ProductShortDescription.js.map
