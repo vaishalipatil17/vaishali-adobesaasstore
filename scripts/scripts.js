@@ -23,6 +23,16 @@ import {
   IS_DA,
 } from './commerce.js';
 
+window.COMMERCE_CONFIG = {
+  'commerce-core-endpoint': 'https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql',
+  'commerce-endpoint': 'https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql',
+  'commerce-store-code': 'default',
+  'commerce-store-view-code': 'default',
+  'headers': {
+    'Store': 'default',
+  },
+};
+
 /*
  * Trusted Types default policy.
  *
