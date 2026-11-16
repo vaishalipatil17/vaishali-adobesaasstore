@@ -1,0 +1,6 @@
+{
+  "commerce-endpoint": "https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql",
+  "headers": {
+    "Store": "default"
+  }
+}
