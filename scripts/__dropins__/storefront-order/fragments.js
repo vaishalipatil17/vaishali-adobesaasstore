@@ -1,0 +1,4 @@
+/*! Copyright 2026 Adobe
+All Rights Reserved. */
+import{A as M,f as D,B as N,C as F,D as a,G as s,h as I,g as O,i as S,b as L,O as P,d as U,k as C,j as o,a as r,P as i,R as m,e as p}from"./api.js";import"@dropins/tools/event-bus.js";import"@dropins/tools/recaptcha.js";import"@dropins/tools/lib.js";import"@dropins/tools/fetch-graphql.js";export{M as ADDRESS_FRAGMENT,D as APPLIED_GIFT_CARDS_FRAGMENT,N as BUNDLE_ORDER_ITEM_DETAILS_FRAGMENT,F as CUSTOMER_ORDER_FRAGMENT,a as DOWNLOADABLE_ORDER_ITEMS_FRAGMENT,s as GIFT_CARD_DETAILS_FRAGMENT,I as GIFT_MESSAGE_FRAGMENT,O as GIFT_WRAPPING_FRAGMENT,S as GUEST_ORDER_FRAGMENT,L as ORDER_ITEM_DETAILS_FRAGMENT,P as ORDER_ITEM_FRAGMENT,U as ORDER_SUMMARY_FRAGMENT,C as PLACE_NEGOTIABLE_QUOTE_ORDER_FRAGMENT,o as PLACE_ORDER_FRAGMENT,r as PRICE_DETAILS_FRAGMENT,i as PRODUCT_DETAILS_FRAGMENT,m as REQUEST_RETURN_ORDER_FRAGMENT,p as RETURNS_FRAGMENT};
+//# sourceMappingURL=fragments.js.map
