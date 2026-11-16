@@ -1,5 +1,15 @@
 {
+  "public": {
+    "default": {
+      "commerce-endpoint": "https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql",
+      "commerce-core-endpoint": "https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql",
+      "headers": {
+        "Store": "default"
+      }
+    }
+  },
   "commerce-endpoint": "https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql",
+  "commerce-core-endpoint": "https://na1-sandbox.api.commerce.adobe.com/Wygj8ddGKPoLMuzs9D5YmS/graphql",
   "headers": {
     "Store": "default"
   }
