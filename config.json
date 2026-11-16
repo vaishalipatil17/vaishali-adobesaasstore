@@ -1,0 +1,26 @@
+{
+  "public": {
+    "default": {
+      "commerce-core-endpoint": "https://na1-sandbox.api.commerce.adobe.com/HrGdF2hSbuwgK1f7Qf23u6/graphql",
+      "commerce-endpoint": "https://na1-sandbox.api.commerce.adobe.com/HrGdF2hSbuwgK1f7Qf23u6/graphql",
+      "adobe-commerce-optimizer": true,
+      "headers": {
+        "cs": {
+          "content-type":"application/json",
+          "AC-View-Id":"4fc58ca6-c0e6-478f-8dfd-20f0122eda3e",
+          "AC-Environment-Id":"HrGdF2hSbuwgK1f7Qf23u6",
+          "AC-Price-Book-Id":"base",
+          "X-Api-Key": "storefront-catalog-apollo"
+        }
+      },
+      "analytics": {
+        "view-id": "4fc58ca6-c0e6-478f-8dfd-20f0122eda3e",
+        "environment": "Testing",
+        "base-currency-code": "USD",
+        "locale":"en-US",
+        "store-url": "https://fy26acodadi-pen-test2--aem-boilerplate-commerce--hlxsites.aem.live/",
+        "environment-id": "HrGdF2hSbuwgK1f7Qf23u6"
+      }
+    }
+  }
+}
